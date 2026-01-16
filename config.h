@@ -13,7 +13,8 @@ const char* password = "your-wifi-password";
 
 // NTP
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 0; // Define the offset of your residense
+const long  gmtOffset_sec = 0; // Define the offset of your residence
 const int   daylightOffset_sec = 0;
+
 
 #endif
