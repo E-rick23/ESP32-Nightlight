@@ -10,7 +10,7 @@ void setUpClock() {
 }
 
 // Function to verify the status of Wi-Fi connection.
-void verificarConexao() {
+void verifyConnection() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("Wi-Fi connection lost. Trying to reconnect...");
     WiFi.disconnect();
