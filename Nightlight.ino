@@ -23,7 +23,7 @@ void setup() {
 
 void loop() {
   // 1. This guarantees Wi-Fi is available.
-  verificarConexao();
+  verifyConnection();
 
   // 2. The logic is only executed after the time set in the waittime variable (Avoids unnecessary processing).
   if (millis() - lastVerification > waittime) {
