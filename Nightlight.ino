@@ -1,47 +1,48 @@
 #include <WiFi.h>
 #include "Config.h"
-#include "Relogio.h"
+#include "Clock.h"
 
-// Variáveis para evitar oscilação (Histerese)
-unsigned long ultimaVerificacao = 0;
-const int intervalo = 5000; // Verifica a cada 5 segundos
+// Variables to avoid time oscilation.
+unsigned long lastVerification = 0;
+const int waittime = 5000; // After 5 seconds, the time is verified.
 
 void setup() {
   Serial.begin(115200);
-  setCpuFrequencyMhz(80); //reduz a frequência do processador para diminuir o consumo energético
-  pinMode(PINO_LED, OUTPUT); 
-  pinMode(PINO_LED2, OUTPUT);
-  pinMode(PINO_LED3, OUTPUT);
-  pinMode(PINO_LDR, INPUT);
+  setCpuFrequencyMhz(80); //This function reduces the ESP processor's frequency to save energy, disable it if you plan to add other functions to it.
+  //Below is the pin setup, pin values can be set at the config.h file.
+  pinMode(LED1, OUTPUT); 
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LDR, INPUT);
 
   WiFi.begin(SSID, password);
   while (WiFi.status() != WL_CONNECTED) { delay(500); }
   
-  configurarRelogio();
+  setUpClock();
 }
 
 void loop() {
-  // 1. Garante que o Wi-Fi esteja sempre vivo
+  // 1. This guarantees Wi-Fi is available.
   verificarConexao();
 
-  // 2. Executa a lógica apenas a cada 'intervalo' (evita processamento desnecessário)
-  if (millis() - ultimaVerificacao > intervalo) {
-    ultimaVerificacao = millis();
+  // 2. The logic is only executed after the time set in the waittime variable (Avoids unnecessary processing).
+  if (millis() - lastVerification > waittime) {
+    lastVerification = millis();
 
-    int sensor_state = digitalRead(PINO_LDR);
-    bool eNoite = verificarHorarioNoturno();
+    int sensor_state = digitalRead(LDR);
+    bool isNight = verifyNightTime();
 
-    if (sensor_state == 1 && eNoite) {
-      digitalWrite(PINO_LED, HIGH); 
-      digitalWrite(PINO_LED2, HIGH);
-      digitalWrite(PINO_LED3, HIGH);
-      Serial.println("Status: Noite e Escuro. LEDs Ligados.");
+    if (sensor_state == 1 && isNight) {
+      digitalWrite(LED1, HIGH); 
+      digitalWrite(LED2, HIGH);
+      digitalWrite(LED3, HIGH);
+      Serial.println("Status: Night and Dark. LEDs are on.");
     } 
     else {
-      digitalWrite(PINO_LED, LOW); 
-      digitalWrite(PINO_LED2, LOW);
-      digitalWrite(PINO_LED3, LOW);
-      Serial.println("Status: Dia ou Luz detectada. LEDs Desligados.");
+      digitalWrite(LED1, LOW); 
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      Serial.println("Status: Light detected. LEDs off.");
     }
   }
 }
